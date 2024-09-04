@@ -120,7 +120,7 @@
 
     <main class="px-3">
         <h1>Rechercher un patient</h1>
-        <form action="${pageContext.request.contextPath}/login" method="get">
+        <form action="${pageContext.request.contextPath}/patients" method="get">
             <input type="text" name="search">
             <button class="btn btn-primary">Valider</button>
         </form>

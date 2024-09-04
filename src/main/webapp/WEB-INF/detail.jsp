@@ -1,4 +1,11 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="patient" scope="request" type="tibo.jee.tpjee.entity.Patient"/>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="java.lang.String" %>
+<%@ page import="java.lang.Math" %>
+<%@ page import="tibo.jee.tpjee.entity.Consultation" %>
+<%@ page import="java.util.Comparator" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en" class="h-100" data-bs-theme="dark">
@@ -109,7 +116,7 @@
         <br/>
         <ul class="nav nav-tabs justify-content-center">
             <li class="nav-item">
-                <a class="nav-link active" href="${pageContext.request.contextPath}/">Accueil</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/">Accueil</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="${pageContext.request.contextPath}/patients">Liste des patients</a>
@@ -120,7 +127,8 @@
     <main class="px-3">
         <div>
             <h1 class="d-flex justify-content-start">Infos du patient :</h1>
-            <img src="${patient.photo}" alt="${patient.firstName} ${patient.lastName}" width="200px"/>
+            <img class="d-flex justify-content-start" src="${patient.photo}"
+                 alt="${patient.firstName} ${patient.lastName}" width="200px"/>
             <h4 class="d-flex justify-content-start">Nom : ${patient.firstName} ${patient.lastName}</h4>
             <h4 class="d-flex justify-content-start">Date de naissance : ${patient.birthDate}</h4>
             <h4 class="d-flex justify-content-start">Téléphone : ${patient.phone}</h4>
@@ -137,6 +145,34 @@
 
         <div>
             <h2 class="d-flex justify-content-start">Liste des consultations</h2>
+            <div class="d-flex flex-column flex-md-row gap-4 py-md-2 justify-content-start">
+                <div class="list-group">
+                    <% patient.getConsultations().sort(Comparator.comparing(Consultation::getDateConsultation).reversed()); %>
+                    <c:forEach var="consultation" items="${patient.consultations}">
+                        <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3"
+                           aria-current="true">
+                            <img src="images/consultation.png" alt="${consultation.id}" width="32" height="32"
+                                 class="rounded-circle flex-shrink-0">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0 d-flex justify-content-start">Consultation n°${consultation.id}</h6>
+                                    <p class="mb-0 opacity-75">${consultation.dateConsultation}</p>
+                                </div>
+                                <small class="opacity-50 text-nowrap">
+                                        ${ChronoUnit.DAYS.between(LocalDate.now(), consultation.dateConsultation) == 0 ?
+                                                "aujourd\'hui" :
+                                                String.format("%s %d jour%s",
+                                                        ChronoUnit.DAYS.between(LocalDate.now(), consultation.dateConsultation) < 0 ?
+                                                                "il y a" :
+                                                                "dans",
+                                                        Math.abs(ChronoUnit.DAYS.between(LocalDate.now(), consultation.dateConsultation)),
+                                                        Math.abs(ChronoUnit.DAYS.between(LocalDate.now(), consultation.dateConsultation)) > 1 ? "s" : "")}
+                                </small>
+                            </div>
+                        </a>
+                    </c:forEach>
+                </div>
+            </div>
         </div>
     </main>
 

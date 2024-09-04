@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import tibo.jee.tpjee.entity.Consultation;
 import tibo.jee.tpjee.entity.Patient;
 import tibo.jee.tpjee.repository.PatientRepository;
+import tibo.jee.tpjee.repository.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,9 +53,41 @@ public class PatientsServlet extends HttpServlet {
         patientRepo.merge(
                 Patient.builder()
                         .firstName("Tibo")
-                        .gender(Patient.Gender.OTHER)
+                        .gender(Patient.Gender.MALE)
                         .birthDate(LocalDate.of(1996, 7, 5))
                         .phone("01 23 45 67 89")
+                        .photo("images/patients/cat.jpg")
+                        .build()
+        );
+
+        new Repository<>(Consultation.class).merge(
+                Consultation.builder()
+                        .patient(patientRepo.get(3))
+                        .dateConsultation(LocalDate.now().minusDays(30))
+                        .build()
+        );
+        new Repository<>(Consultation.class).merge(
+                Consultation.builder()
+                        .patient(patientRepo.get(3))
+                        .dateConsultation(LocalDate.now().minusDays(1))
+                        .build()
+        );
+        new Repository<>(Consultation.class).merge(
+                Consultation.builder()
+                        .patient(patientRepo.get(3))
+                        .dateConsultation(LocalDate.now())
+                        .build()
+        );
+        new Repository<>(Consultation.class).merge(
+                Consultation.builder()
+                        .patient(patientRepo.get(3))
+                        .dateConsultation(LocalDate.now().plusDays(1))
+                        .build()
+        );
+        new Repository<>(Consultation.class).merge(
+                Consultation.builder()
+                        .patient(patientRepo.get(3))
+                        .dateConsultation(LocalDate.now().plusDays(7))
                         .build()
         );
     }
@@ -79,7 +113,6 @@ public class PatientsServlet extends HttpServlet {
             patients = patientRepo.getAll();
         }
         req.setAttribute("patients", patients);
-        req.setAttribute("defaultImage", "images/default.png");
         req.setAttribute("loggedAs", loggedAs);
         req.getRequestDispatcher("WEB-INF/patients.jsp").forward(req, resp);
     }
@@ -125,7 +158,8 @@ public class PatientsServlet extends HttpServlet {
                             .gender(gender)
                             .birthDate(birthDate)
                             .phone(phone)
-                            .photo(String.format("images%s%s",
+                            .photo(String.format("images%spatients%s%s",
+                                    File.separator,
                                     File.separator,
                                     filename))
                             .build()
